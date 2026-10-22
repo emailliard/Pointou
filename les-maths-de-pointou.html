@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Les maths de Pointou</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Mise en page : un « tableau noir » comme le fond des vidéos ; la troupe des personnages en ouverture,
+   puis les vidéos rangées par thème, filtrables par niveau. Thème sombre unique, choisi pour coller aux vidéos. */
+:root {
+  --bg: #12171e;          /* ardoise, comme le fond des vidéos */
+  --surface: #1b222c;
+  --line: #2b3542;
+  --fg: #eef1f5;
+  --muted: #9ba7b6;
+  --jaune: #FFD866;       /* palette des vidéos */
+  --bleu: #58C4DD;
+  --vert: #83C167;
+  --rouge: #FC6255;
+  --orange: #FFA94D;
+  --violet: #C39BD3;
+  --brun: #A0785A;
+  --font-display: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+[hidden] { display: none !important; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+.wrap { max-width: 1080px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+
+/* --- ouverture --- */
+.hero { padding-block: 40px 28px; display: grid; gap: 18px; }
+.eyebrow {
+  font-family: var(--font-display); font-weight: 600; font-size: .85rem;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--bleu);
+}
+.hero h1 { font-size: clamp(2.3rem, 6vw, 3.8rem); line-height: 1.02; font-weight: 700; }
+.hero h1 .p { color: var(--jaune); }
+.hero .lead { max-width: 60ch; color: var(--muted); margin: 0; font-size: 1.1rem; }
+.hero .lead strong { color: var(--fg); }
+
+.troupe {
+  display: flex; flex-wrap: wrap; gap: 6px 4px; align-items: flex-end;
+  padding: 14px 0 0; border-bottom: 2px dashed var(--line);
+}
+.perso { display: grid; justify-items: center; gap: 2px; width: 92px; }
+.perso svg { width: 74px; height: 74px; transition: transform .25s; }
+.perso:hover svg { transform: translateY(-6px) rotate(-4deg); }
+.perso span { font-family: var(--font-display); font-weight: 600; font-size: .9rem; }
+.perso small { color: var(--muted); font-size: .72rem; text-align: center; line-height: 1.2; min-height: 2.4em; }
+
+/* --- onglets (domaines) --- */
+.onglets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 26px; border-bottom: 2px solid var(--line); }
+.onglet {
+  font: 600 1.2rem var(--font-display); color: var(--muted); cursor: pointer; background: transparent;
+  border: 2px solid transparent; border-bottom: none; border-radius: 12px 12px 0 0;
+  padding: 10px 20px; margin-bottom: -2px; display: inline-flex; align-items: center; gap: 10px;
+}
+.onglet svg { width: 34px; height: 34px; }
+.onglet:hover { color: var(--fg); }
+.onglet[aria-selected="true"] { color: var(--fg); background: var(--surface); border-color: var(--line); }
+.onglet:focus-visible { outline: 3px solid var(--bleu); outline-offset: 2px; }
+.sommaire { display: flex; flex-wrap: wrap; gap: 8px 18px; padding-bottom: 4px; }
+.sommaire button {
+  font: 400 .95rem var(--font-body); color: var(--bleu); background: none; border: none; padding: 4px 0;
+  cursor: pointer; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line);
+}
+.sommaire button:hover { text-decoration-color: var(--bleu); }
+
+/* --- filtres --- */
+.filtres { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; padding-block: 22px 8px; }
+.filtres .lbl { font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font: 600 1rem var(--font-display); color: var(--fg); cursor: pointer;
+  background: transparent; border: 2px solid var(--line); border-radius: 999px; padding: 6px 16px;
+}
+.chip:hover { border-color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--jaune); border-color: var(--jaune); color: #1a1a1a; }
+.chip:focus-visible, .btn:focus-visible { outline: 3px solid var(--bleu); outline-offset: 2px; }
+
+/* --- sections et cartes --- */
+.theme { padding-top: 26px; display: grid; gap: 14px; }
+.theme h2 { font-size: 1.5rem; font-weight: 600; display: flex; align-items: baseline; gap: 10px; }
+.theme h2 .n { font: 400 .95rem var(--font-body); color: var(--muted); }
+.grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+.carte {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+  display: grid; grid-template-rows: auto 1fr;
+}
+.vignette {
+  position: relative; aspect-ratio: 16 / 7; max-width: 100%; background: #0b0f14;
+  display: flex; align-items: center; justify-content: space-between; padding: 0 22px;
+  border-bottom: 3px solid var(--c, var(--jaune));
+}
+.vignette .formule {
+  font: 600 clamp(1.4rem, 4vw, 1.9rem) var(--font-display); color: var(--c, var(--jaune));
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.vignette svg { width: 78px; height: 78px; flex: none; }
+.niveau {
+  position: absolute; top: 10px; left: 12px; font: 700 .8rem var(--font-display);
+  background: var(--fg); color: #12171e; border-radius: 6px; padding: 1px 8px;
+}
+.corps { padding: 16px 18px 18px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.corps h3 { font-size: 1.22rem; font-weight: 600; line-height: 1.2; }
+.corps p { margin: 0; color: var(--muted); font-size: .97rem; }
+.pied { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-top: 6px; }
+.duree { font-size: .88rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.btn {
+  font: 600 1rem var(--font-display); text-decoration: none; border-radius: 10px; padding: 8px 16px;
+  background: var(--c, var(--jaune)); color: #12171e; display: inline-flex; gap: 8px; align-items: center;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn.bientot { background: transparent; color: var(--muted); border: 2px dashed var(--line); cursor: default; }
+.vide { color: var(--muted); padding: 24px 0; }
+
+/* --- conseils --- */
+.conseils {
+  margin-top: 40px; border: 2px solid var(--line); border-radius: 16px; padding: 22px;
+  display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center;
+}
+.conseils svg { width: 96px; height: 96px; }
+.conseils h2 { font-size: 1.35rem; font-weight: 600; margin-bottom: 8px; color: var(--rouge); }
+.conseils ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
+.conseils li::marker { color: var(--rouge); }
+footer { margin-top: 32px; color: var(--muted); font-size: .88rem; }
+@media (max-width: 520px) {
+  .conseils { grid-template-columns: 1fr; }
+  .perso { width: 78px; } .perso svg { width: 62px; height: 62px; }
+}
+@media (prefers-reduced-motion: reduce) { .perso svg { transition: none; } }
+</style>
+</head>
+<body>
+
+<!-- Les personnages (dessins originaux des vidéos) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="yx"><circle r="1" fill="#fff"/><circle r=".45" cy=".12" fill="#111"/></g>
+    <symbol id="pointou" viewBox="0 0 100 100">
+      <circle cx="50" cy="56" r="30" fill="#FFD866"/>
+      <use href="#yx" transform="translate(40 48) scale(8)"/><use href="#yx" transform="translate(60 48) scale(8)"/>
+      <circle cx="50" cy="60" r="3" fill="#111"/>
+      <path d="M39 68 Q50 77 61 68" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="zero" viewBox="0 0 100 100">
+      <ellipse cx="50" cy="52" rx="23" ry="34" fill="none" stroke="#C39BD3" stroke-width="10"/>
+      <use href="#yx" transform="translate(43 46) scale(6)"/><use href="#yx" transform="translate(57 46) scale(6)"/>
+      <path d="M44 60 Q50 66 56 60" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="un" viewBox="0 0 100 100">
+      <path d="M54 88 V16 L38 31" fill="none" stroke="#FC6255" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+      <use href="#yx" transform="translate(48 44) scale(5.5)"/><use href="#yx" transform="translate(61 44) scale(5.5)"/>
+      <path d="M49 56 Q54 61 59 56" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="trigo" viewBox="0 0 100 100">
+      <path d="M27 62 L9 42 M73 62 L91 42" stroke="#83C167" stroke-width="6" stroke-linecap="round"/>
+      <polygon points="50,14 86,84 14,84" fill="#83C167" stroke="#83C167" stroke-width="4" stroke-linejoin="round"/>
+      <use href="#yx" transform="translate(43 58) scale(6.5)"/><use href="#yx" transform="translate(57 58) scale(6.5)"/>
+      <path d="M43 71 Q50 77 57 71" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="reglo" viewBox="0 0 100 100">
+      <rect x="36" y="8" width="30" height="84" rx="4" fill="#58C4DD"/>
+      <path d="M36 16h9M36 24h5M36 32h5M36 40h9M36 48h5M36 56h5M36 64h9M36 72h5M36 80h5M36 88h9" stroke="#111" stroke-width="1.8"/>
+      <use href="#yx" transform="translate(50 32) scale(5)"/><use href="#yx" transform="translate(61 32) scale(5)"/>
+      <path d="M50 44 Q55.5 49 61 44" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="compassine" viewBox="0 0 100 100">
+      <path d="M50 38 L32 86 M50 38 L68 86" stroke="#bfc6cf" stroke-width="7" stroke-linecap="round"/>
+      <path d="M32 86 L31 93" stroke="#fff" stroke-width="3"/><path d="M68 86 L69 93" stroke="#555" stroke-width="5"/>
+      <circle cx="50" cy="26" r="15" fill="#FFA94D"/>
+      <use href="#yx" transform="translate(44.5 24) scale(4.5)"/><use href="#yx" transform="translate(55.5 24) scale(4.5)"/>
+      <path d="M45 32 Q50 36 55 32" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="hulotte" viewBox="0 0 100 100">
+      <polygon points="26,34 32,18 40,30" fill="#A0785A"/><polygon points="74,34 68,18 60,30" fill="#A0785A"/>
+      <ellipse cx="50" cy="60" rx="28" ry="33" fill="#A0785A"/>
+      <ellipse cx="50" cy="73" rx="16" ry="17" fill="#D9C2A7"/>
+      <use href="#yx" transform="translate(40 50) scale(8)"/><use href="#yx" transform="translate(60 50) scale(8)"/>
+      <circle cx="40" cy="50" r="10.5" fill="none" stroke="#111" stroke-width="2.5"/>
+      <circle cx="60" cy="50" r="10.5" fill="none" stroke="#111" stroke-width="2.5"/>
+      <path d="M49.5 50h1" stroke="#111" stroke-width="2.5"/>
+      <polygon points="46,60 54,60 50,67" fill="#FFA94D"/>
+      <rect x="30" y="18" width="40" height="7" fill="#3a3a3a" stroke="#888" stroke-width="1"/>
+      <rect x="40" y="25" width="20" height="5" fill="#3a3a3a"/>
+      <path d="M62 22 L68 36" stroke="#FFD866" stroke-width="2.5" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Mathématiques · Collège</div>
+    <h1>Les maths de <span class="p">Pointou</span></h1>
+    <p class="lead">Des petites vidéos pour revoir le cours à la maison, quand tu veux et autant de fois que tu veux. <strong>Quand le compte à rebours démarre, mets sur pause et cherche !</strong></p>
+    <div class="troupe" aria-label="Les personnages des vidéos">
+      <div class="perso"><svg><use href="#pointou"/></svg><span>Pointou</span><small>guide des nombres</small></div>
+      <div class="perso"><svg><use href="#zero"/></svg><span>Zéro</span><small>calcul et chamailleries</small></div>
+      <div class="perso"><svg><use href="#un"/></svg><span>Un</span><small>toujours avec Zéro</small></div>
+      <div class="perso"><svg><use href="#trigo"/></svg><span>Trigo</span><small>le triangle sportif</small></div>
+      <div class="perso"><svg><use href="#reglo"/></svg><span>Règlo</span><small>mesure et trace</small></div>
+      <div class="perso"><svg><use href="#compassine"/></svg><span>Compassine</span><small>trace les cercles</small></div>
+      <div class="perso"><svg><use href="#hulotte"/></svg><span>Pr Hulotte</span><small>ce qu'il faut retenir</small></div>
+    </div>
+  </header>
+
+  <div class="onglets" role="tablist" aria-label="Domaines" id="onglets"></div>
+
+  <nav class="filtres" aria-label="Filtrer les vidéos">
+    <span class="lbl">Ma classe</span>
+    <div class="chips" id="chips-niveau"></div>
+  </nav>
+  <nav class="sommaire" id="sommaire" aria-label="Rubriques"></nav>
+
+  <main id="liste" role="tabpanel"></main>
+
+  <section class="conseils">
+    <svg aria-hidden="true"><use href="#hulotte"/></svg>
+    <div>
+      <h2>Les conseils du Pr Hulotte</h2>
+      <ul>
+        <li>Regarde la vidéo une première fois en entier, sans rien écrire.</li>
+        <li>Au compte à rebours, mets sur pause et cherche sur ton cahier avant de voir la correction.</li>
+        <li>Recopie l'encadré « Je retiens » s'il n'est pas déjà dans ton cours.</li>
+        <li>Une question ? Note-la et pose-la au prochain cours.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>Vidéos hébergées sur Tubes (apps.education.fr), la plateforme de l'Éducation nationale : sans publicité et sans compte à créer.
+    Toutes nos vidéos sont aussi sur <a href="https://tube-sciences-technologies.apps.education.fr/a/edwige_mailliard" target="_blank" rel="noopener" style="color: var(--bleu)">notre chaîne Tubes</a>.</footer>
+</div>
+
+<script>
+/* ================================================================
+   LES VIDÉOS — pour ajouter un lien Tubes, le coller entre les
+   guillemets de « lien ». Sans lien, la carte affiche « Bientôt en ligne ».
+   ================================================================ */
+const ONGLETS = [
+  { id: "nombres", nom: "Nombres et calculs", rubriques: [
+    { id: "decimaux", nom: "Nombres décimaux" },
+    { id: "relatifs", nom: "Nombres relatifs" },
+    { id: "fractions", nom: "Fractions" },
+    { id: "litteral", nom: "Calcul littéral" },
+    { id: "donnees", nom: "Proportionnalité et statistiques" },
+  ]},
+  { id: "geometrie", nom: "Géométrie", rubriques: [
+    { id: "angles", nom: "Angles" },
+    { id: "cercle", nom: "Cercle et disque" },
+  ]},
+];
+const VIDEOS = [
+  { theme: "decimaux", niveau: "6e", perso: "un", c: "var(--orange)", formule: "2,5 + 1,75",
+    titre: "Additionner des nombres décimaux",
+    resume: "Aligner les virgules et les chiffres de même rang pour poser et calculer une addition.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/khqRTgYLXh6qG1AjndJ1ss" },
+  { theme: "decimaux", niveau: "6e", perso: "pointou", c: "var(--bleu)", formule: "5 − 1,75",
+    titre: "Soustraire des nombres décimaux",
+    resume: "Aligner les virgules, compléter avec des zéros et gérer les retenues.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/74KYYfzPZH4iew3ucsj1gB" },
+  { theme: "decimaux", niveau: "6e", perso: "zero", c: "var(--violet)", formule: "17 = 5 × 3 + 2",
+    titre: "La division euclidienne",
+    resume: "Trouver le quotient et le reste, et écrire l'égalité de la division euclidienne.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/s9UrAwAg7cPZUuM47FPFG9" },
+  { theme: "decimaux", niveau: "6e", perso: "zero", c: "var(--rouge)", formule: "5 ÷ 0 = ?",
+    titre: "Pourquoi on ne divise pas par zéro",
+    resume: "Zéro a un pouvoir que les autres nombres n'ont pas : on comprend pourquoi diviser par 0 est impossible.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/f98d7kMz5tMwZxHwwd15mu" },
+  { theme: "decimaux", niveau: "6e", perso: "pointou", c: "var(--jaune)", formule: "8,247 ≈ 8,25",
+    titre: "Arrondir un nombre décimal",
+    resume: "La colline des nombres, les deux pièges de l'arrondi et des exemples de la vie courante.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/4edCUfNGCjYiqe1bfTPbik" },
+  { theme: "relatifs", niveau: "5e", perso: "zero", c: "var(--rouge)", formule: "(−3) + (+5)",
+    titre: "Additionner des nombres relatifs",
+    resume: "Sur la droite graduée puis avec des jetons que Zéro mange, et les règles à retenir.",
+    duree: "3 min 42", lien: "https://tube-sciences-technologies.apps.education.fr/w/iJZaFcgVdRtb4LT5Ft2Ujb" },
+  { theme: "fractions", niveau: "6e", perso: "pointou", c: "var(--orange)", formule: "3⁄4",
+    titre: "Fractions (1) : la fraction, un quotient",
+    resume: "Première partie du chapitre : ce que représente une fraction.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/naVzbyiDrE1BEuwPnF1iVN" },
+  { theme: "fractions", niveau: "6e", perso: "zero", c: "var(--violet)", formule: "7 ÷ 3 = 7⁄3",
+    titre: "Fractions (2) : le quotient de deux nombres",
+    resume: "a⁄b est le nombre qui, multiplié par b, donne a : c'est le quotient de a par b.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/pxtrccqacxuyofymdwRpvF" },
+  { theme: "fractions", niveau: "6e", perso: "un", c: "var(--rouge)", formule: "⅔ de 12",
+    titre: "Fractions (4) : nature et fraction d'un nombre",
+    resume: "Savoir quel nombre représente une fraction, puis calculer une fraction d'un nombre.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/snyDp5BKXBZD74B6YPnYFj" },
+  { theme: "litteral", niveau: "5e", perso: "pointou", c: "var(--jaune)", formule: "x = 3",
+    titre: "Substituer une valeur",
+    resume: "Remplacer la lettre par un nombre pour calculer la valeur d'une expression.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/bALNZSVb6QFtrUDNcdk4pu" },
+  { theme: "litteral", niveau: "4e", perso: "zero", c: "var(--violet)", formule: "3x + 5x = 8x",
+    titre: "Réduire une expression",
+    resume: "Regrouper les termes semblables pour écrire une expression littérale plus simplement.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/v8d9ih5R5BK9gUpzwHe2gT" },
+  { theme: "litteral", niveau: "4e", perso: "pointou", c: "var(--bleu)", formule: "x = 2 ?",
+    titre: "Tester une égalité",
+    resume: "Remplacer la lettre par une valeur pour savoir si l'égalité est vraie.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/7suxD9T29bYFh7nw7Lz4fr" },
+  { theme: "litteral", niveau: "4e", perso: "un", c: "var(--orange)", formule: "k(a + b)",
+    titre: "La distributivité",
+    resume: "Développer avec la distributivité : k × (a + b) = k × a + k × b.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/eqJ3tY7aQ4dYebnDdt5LBa" },
+  { theme: "donnees", niveau: "6e", perso: "pointou", c: "var(--orange)", formule: "× 1,2",
+    titre: "Deux grandeurs proportionnelles",
+    resume: "Les croissants de la boulangerie, la machine à multiplier et Pointou qui devient géant.",
+    duree: "≈ 3 min 30", lien: "https://tube-sciences-technologies.apps.education.fr/w/mh3hALMdNxv5fDJ3EqZ4VC" },
+  { theme: "donnees", niveau: "6e", perso: "pointou", c: "var(--violet)", formule: "250 g → 10",
+    titre: "Compléter un tableau de proportionnalité",
+    resume: "La recette de crêpes : 4 techniques, plus le produit en croix en bonus pour la 4e.",
+    duree: "≈ 3 min", lien: "https://tube-sciences-technologies.apps.education.fr/w/dLz3wJ1JCY2XKSHs3cjbfM" },
+  { theme: "donnees", niveau: "4e", perso: "un", c: "var(--vert)", formule: "Me = ?",
+    titre: "Déterminer la médiane d'une série",
+    resume: "On range les valeurs, on élimine deux par deux : avec un nombre de valeurs pair et impair.",
+    duree: "≈ 2 min 30", lien: "https://tube-sciences-technologies.apps.education.fr/w/95ggxYZFrqRVAxNq3AAtwR" },
+  { theme: "cercle", niveau: "6e", perso: "compassine", c: "var(--bleu)", formule: "M ∈ 𝒞 ?",
+    titre: "Cercle ou disque ?",
+    resume: "Pointou cherche où il habite : sur le cercle, dans le disque ou dehors.",
+    duree: "≈ 2 min 30", lien: "https://tube-sciences-technologies.apps.education.fr/w/nmHN1mTnwwMfqpjCZQ8srj" },
+  { theme: "angles", niveau: "6e", perso: "hulotte", c: "var(--jaune)", formule: "90°",
+    titre: "Le vocabulaire des angles",
+    resume: "Les angles particuliers : droit, aigu, obtus, puis nul, plat et plein.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/rZesdkP4ubFq4ScLZ9gzqz" },
+  { theme: "angles", niveau: "6e", perso: "reglo", c: "var(--bleu)", formule: "125°",
+    titre: "Mesurer un angle",
+    resume: "Placer le rapporteur et lire la bonne graduation pour mesurer un angle en degrés.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/2nSmGkNcuDuD4AAv3gkTc5" },
+  { theme: "angles", niveau: "6e", perso: "trigo", c: "var(--violet)", formule: "côte à côte",
+    titre: "Positions de deux angles",
+    resume: "Reconnaître des angles adjacents : un sommet commun, un côté commun, chacun de son côté.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/apB7n3u6DWK3gFrzoU3zEB" },
+  { theme: "angles", niveau: "6e", perso: "compassine", c: "var(--orange)", formule: "40° = 40°",
+    titre: "La bissectrice d'un angle",
+    resume: "La demi-droite qui partage un angle en deux angles de même mesure, et comment la construire.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/gNmi26sn6BfxiEBLZWfSbc" },
+  { theme: "angles", niveau: "5e", perso: "reglo", c: "var(--orange)", formule: "(d) // (d′)",
+    titre: "Angles et droites sécantes",
+    resume: "Angles alternes-internes et correspondants formés par deux droites et une sécante.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/n1KqwRr4nVSrnjPqcissbH" },
+  { theme: "angles", niveau: "5e", perso: "trigo", c: "var(--vert)", formule: "// ⇔ =",
+    titre: "Angles et droites parallèles",
+    resume: "Les propriétés qui relient droites parallèles et angles alternes-internes ou correspondants de même mesure.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/aYZG18WdSVkaYgzZwZbhLS" },
+  { theme: "angles", niveau: "5e", perso: "hulotte", c: "var(--violet)", formule: "Euclide",
+    titre: "Le postulat des parallèles",
+    resume: "Un peu d'histoire : Euclide et le postulat des parallèles.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/xoAcUkDxPGTgprQ1NhNvwJ" },
+];
+const NIVEAUX = ["Tous", "6e", "5e", "4e", "3e"];
+
+const ICONES = { nombres: "pointou", geometrie: "trigo" };
+
+let niveau = "Tous";
+try { niveau = localStorage.getItem("niveau") || "Tous"; } catch (e) {}
+if (!NIVEAUX.includes(niveau)) niveau = "Tous";
+
+let onglet = (location.hash || "").slice(1);
+if (!ONGLETS.some(o => o.id === onglet)) {
+  onglet = "nombres";
+  try { onglet = localStorage.getItem("onglet") || "nombres"; } catch (e) {}
+  if (!ONGLETS.some(o => o.id === onglet)) onglet = "nombres";
+}
+
+const esc = s => s.replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+
+function carte(v) {
+  const bouton = v.lien
+    ? `<a class="btn" href="${esc(v.lien)}" target="_blank" rel="noopener">▶ Regarder</a>`
+    : `<span class="btn bientot">Bientôt en ligne</span>`;
+  return `<article class="carte" style="--c:${v.c}">
+    <div class="vignette"><span class="niveau">${v.niveau}</span>
+      <span class="formule">${esc(v.formule)}</span><svg aria-hidden="true"><use href="#${v.perso}"/></svg></div>
+    <div class="corps"><h3>${esc(v.titre)}</h3><p>${esc(v.resume)}</p>
+      <div class="pied"><span class="duree">${v.duree ? "⏱ " + v.duree : ""}</span>${bouton}</div></div>
+  </article>`;
+}
+
+function rendre() {
+  document.getElementById("chips-niveau").innerHTML = NIVEAUX.map(n =>
+    `<button class="chip" id="niv-${n}" aria-pressed="${n === niveau}" data-n="${n}">${n}</button>`).join("");
+  const liste = VIDEOS.filter(v => niveau === "Tous" || v.niveau === niveau);
+  document.getElementById("onglets").innerHTML = ONGLETS.map(o => {
+    const n = liste.filter(v => o.rubriques.some(r => r.id === v.theme)).length;
+    return `<button class="onglet" role="tab" id="tab-${o.id}" data-o="${o.id}" aria-selected="${o.id === onglet}">
+      <svg aria-hidden="true"><use href="#${ICONES[o.id]}"/></svg>${o.nom} <span class="n" style="font:400 .9rem var(--font-body);color:var(--muted)">${n}</span></button>`;
+  }).join("");
+  const o = ONGLETS.find(x => x.id === onglet);
+  const rubs = o.rubriques.map(r => ({ ...r, vs: liste.filter(v => v.theme === r.id) })).filter(r => r.vs.length);
+  document.getElementById("sommaire").innerHTML = rubs.length > 1
+    ? rubs.map(r => `<button data-r="${r.id}">${r.nom}</button>`).join("") : "";
+  document.getElementById("liste").setAttribute("aria-labelledby", "tab-" + onglet);
+  document.getElementById("liste").innerHTML = rubs.map(r =>
+    `<section class="theme" id="r-${r.id}"><h2>${r.nom} <span class="n">${r.vs.length} vidéo${r.vs.length > 1 ? "s" : ""}</span></h2>
+      <div class="grille">${r.vs.map(carte).join("")}</div></section>`).join("") ||
+    `<p class="vide">Pas encore de vidéo de ${o.nom.toLowerCase()} pour la ${niveau}. Elles arrivent bientôt !</p>`;
+}
+
+document.getElementById("onglets").addEventListener("click", e => {
+  const b = e.target.closest(".onglet"); if (!b) return;
+  onglet = b.dataset.o;
+  try { localStorage.setItem("onglet", onglet); } catch (err) {}
+  try { history.replaceState(null, "", "#" + onglet); } catch (err) {}
+  rendre();
+});
+document.getElementById("sommaire").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const cible = document.getElementById("r-" + b.dataset.r);
+  if (cible) cible.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+});
+
+document.getElementById("chips-niveau").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  niveau = b.dataset.n;
+  try { localStorage.setItem("niveau", niveau); } catch (err) {}
+  rendre();
+});
+rendre();
+</script>
+
+</body>
+</html>
