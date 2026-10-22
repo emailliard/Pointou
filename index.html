@@ -255,6 +255,7 @@ const ONGLETS = [
   { id: "nombres", nom: "Nombres et calculs", rubriques: [
     { id: "decimaux", nom: "Nombres décimaux" },
     { id: "relatifs", nom: "Nombres relatifs" },
+    { id: "puissances", nom: "Carrés et racines carrées" },
     { id: "fractions", nom: "Fractions" },
     { id: "litteral", nom: "Calcul littéral" },
     { id: "donnees", nom: "Proportionnalité et statistiques" },
@@ -262,6 +263,7 @@ const ONGLETS = [
   { id: "geometrie", nom: "Géométrie", rubriques: [
     { id: "angles", nom: "Angles" },
     { id: "cercle", nom: "Cercle et disque" },
+    { id: "pythagore", nom: "Théorème de Pythagore" },
   ]},
 ];
 const VIDEOS = [
@@ -289,6 +291,10 @@ const VIDEOS = [
     titre: "Additionner des nombres relatifs",
     resume: "Sur la droite graduée puis avec des jetons que Zéro mange, et les règles à retenir.",
     duree: "3 min 42", lien: "https://tube-sciences-technologies.apps.education.fr/w/iJZaFcgVdRtb4LT5Ft2Ujb" },
+  { theme: "puissances", niveau: "4e", perso: "un", c: "var(--vert)", formule: "√49 = 7",
+    titre: "Les racines carrées",
+    resume: "La racine carrée d'un nombre positif est le nombre positif dont le carré est égal à ce nombre.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/te6sKCeGj6DQu85UAUXF9Q" },
   { theme: "fractions", niveau: "6e", perso: "pointou", c: "var(--orange)", formule: "3⁄4",
     titre: "Fractions (1) : la fraction, un quotient",
     resume: "Première partie du chapitre : ce que représente une fraction.",
@@ -333,6 +339,10 @@ const VIDEOS = [
     titre: "Cercle ou disque ?",
     resume: "Pointou cherche où il habite : sur le cercle, dans le disque ou dehors.",
     duree: "≈ 2 min 30", lien: "https://tube-sciences-technologies.apps.education.fr/w/nmHN1mTnwwMfqpjCZQ8srj" },
+  { theme: "pythagore", niveau: "4e", perso: "trigo", c: "var(--rouge)", formule: "a² + b² = c²",
+    titre: "Le théorème de Pythagore",
+    resume: "Dans un triangle rectangle, le carré de l'hypoténuse est égal à la somme des carrés des deux autres côtés.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/emNRz1WLGMJ6Wk9BudCegR" },
   { theme: "angles", niveau: "6e", perso: "hulotte", c: "var(--jaune)", formule: "90°",
     titre: "Le vocabulaire des angles",
     resume: "Les angles particuliers : droit, aigu, obtus, puis nul, plat et plein.",
