@@ -116,6 +116,7 @@ h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
   position: absolute; top: 10px; left: 12px; font: 700 .8rem var(--font-display);
   background: var(--fg); color: #12171e; border-radius: 6px; padding: 1px 8px;
 }
+.mention { font-weight: 500; color: #4a5563; border-left: 1px solid #9ba7b6; padding-left: 6px; margin-left: 2px; }
 .corps { padding: 16px 18px 18px; display: grid; gap: 8px; align-content: start; min-width: 0; }
 .corps h3 { font-size: 1.22rem; font-weight: 600; line-height: 1.2; }
 .corps p { margin: 0; color: var(--muted); font-size: .97rem; }
@@ -276,6 +277,14 @@ const VIDEOS = [
     titre: "Soustraire des nombres décimaux",
     resume: "Aligner les virgules, compléter avec des zéros et gérer les retenues.",
     duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/74KYYfzPZH4iew3ucsj1gB" },
+  { theme: "decimaux", niveau: "6e", mention: "Révision CM2", perso: "un", c: "var(--vert)", formule: "47 × 23",
+    titre: "La multiplication posée",
+    resume: "Poser une multiplication en colonnes, ligne par ligne, avec les retenues et le décalage.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/egohM92JtDgVbtJEVoqQfV" },
+  { theme: "decimaux", niveau: "6e", mention: "Révision CM2", perso: "zero", c: "var(--orange)", formule: "× en grille",
+    titre: "La multiplication par jalousies",
+    resume: "Une autre façon de multiplier, dans une grille avec des diagonales, venue du Moyen Âge.",
+    duree: "", lien: "https://tube-sciences-technologies.apps.education.fr/w/iBavgLoQfuYYqQdNUcY7X8" },
   { theme: "decimaux", niveau: "6e", perso: "zero", c: "var(--violet)", formule: "17 = 5 × 3 + 2",
     titre: "La division euclidienne",
     resume: "Trouver le quotient et le reste, et écrire l'égalité de la division euclidienne.",
@@ -423,7 +432,7 @@ function carte(v) {
     ? `<a class="btn" href="${esc(v.lien)}" target="_blank" rel="noopener">▶ Regarder</a>`
     : `<span class="btn bientot">Bientôt en ligne</span>`;
   return `<article class="carte" style="--c:${v.c}">
-    <div class="vignette"><span class="niveau">${v.niveau}</span>
+    <div class="vignette"><span class="niveau">${v.niveau}${v.mention ? ` <span class="mention">${esc(v.mention)}</span>` : ""}</span>
       <span class="formule">${esc(v.formule)}</span><svg aria-hidden="true"><use href="#${v.perso}"/></svg></div>
     <div class="corps"><h3>${esc(v.titre)}</h3><p>${esc(v.resume)}</p>
       <div class="pied"><span class="duree">${v.duree ? "⏱ " + v.duree : ""}</span>${bouton}</div></div>
